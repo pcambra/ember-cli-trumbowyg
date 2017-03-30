@@ -61,17 +61,12 @@ export default Ember.Component.extend({
   didUpdateAttrs(attrs) {
     const optionsUpdated = this.get('optionNames')
       .some(optionName => this._isAttrChanged(attrs, optionName));
-    const htmlUpdated = Ember.get(attrs, 'newAttrs.html.value') !== this.$().trumbowyg('html');
     const disabledUpdated = this._isAttrChanged(attrs, 'disabled');
     const placeholderUpdated = this._isAttrChanged(attrs, 'placeholder');
 
     if (optionsUpdated || placeholderUpdated) {
       this._destroyTrumbowyg();
       this._renderTrumbowyg();
-    }
-
-    if (htmlUpdated) {
-      this.$().trumbowyg('html', this.get('html'));
     }
 
     if (disabledUpdated) {
