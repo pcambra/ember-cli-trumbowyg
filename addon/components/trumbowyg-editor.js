@@ -15,6 +15,7 @@ export default Ember.Component.extend(DynamicAttributeBindings, {
     'prefix',
     'lang',
     'btns',
+    'btnsDef',
     'semantic',
     'resetCss',
     'removeformatPasted',
