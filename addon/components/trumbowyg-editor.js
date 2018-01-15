@@ -1,48 +1,49 @@
-import Ember from 'ember';
-
+import Component from '@ember/component';
+import { get, set, getProperties } from '@ember/object';
 import DynamicAttributeBindings from '../-private/dynamic-attribute-bindings';
 
-export default Ember.Component.extend(DynamicAttributeBindings, {
+export default Component.extend(DynamicAttributeBindings, {
   attributeBindings: [],
   tagName: 'textarea',
   html: null,
   placeholder: null,
   disabled: null,
   change: null,
-
-  optionNames: [
-    'prefix',
-    'lang',
-    'btns',
-    'btnsDef',
-    'semantic',
-    'resetCss',
-    'removeformatPasted',
-    'autogrow'
-  ],
-
+  init() {
+    this.optionNames = [
+      'prefix',
+      'lang',
+      'btns',
+      'btnsDef',
+      'semantic',
+      'resetCss',
+      'removeformatPasted',
+      'autogrow'
+    ];
+    this._super(...arguments);
+  },
   _updateDisabled(){
-    if (typeof this.get("disabled") === "boolean") {
-      this.$().trumbowyg(this.get('disabled') ? 'disable' : 'enable');
+    if (typeof get(this, "disabled") === "boolean") {
+      this.$().trumbowyg(get(this, 'disabled') ? 'disable' : 'enable');
     }
   },
 
   _renderTrumbowyg(){
-    const options = this.get('optionNames')
-      .filter(optionName => this.get(optionName) !== undefined )
+    const options = get(this, 'optionNames')
+      .filter(optionName => get(this, optionName) !== undefined )
       .reduce((options, optionName) => {
-        options[optionName] = this.get(optionName);
+        options[optionName] = get(this, optionName);
         return options;
       }, {});
 
-    this.$().attr("placeholder", this.get("placeholder"));
+    this.$().attr("placeholder", get(this, "placeholder"));
     this.$().trumbowyg(options);
-    this.$().trumbowyg('html', this.get('html'));
+    this.$().trumbowyg('html', get(this, 'html'));
     this._updateDisabled();
 
     this.$().on('tbwchange', () => {
-      if (this.get('change')) {
-        this.get('change')(this.$().trumbowyg('html'));
+      if (get(this, 'change')) {
+        get(this, 'change')(this.$().trumbowyg('html'));
       }
     });
   },
@@ -53,7 +54,7 @@ export default Ember.Component.extend(DynamicAttributeBindings, {
   },
 
   _isAttrChanged(attrName){
-    return this.get(attrName) !== this.get(`_oldOptions.${attrName}`);
+    return get(this, attrName) !== get(this, `_oldOptions.${attrName}`);
   },
 
   didInsertElement(){
@@ -61,11 +62,11 @@ export default Ember.Component.extend(DynamicAttributeBindings, {
   },
 
   didUpdateAttrs() {
-    const options = this.getProperties(this.get('optionNames').concat(['disabled', 'placeholder']));
+    const options = getProperties(this, get(this, 'optionNames').concat(['disabled', 'placeholder']));
 
-    const optionsUpdated = this.get('optionNames').some(optionName => this._isAttrChanged(optionName));
+    const optionsUpdated = get(this, 'optionNames').some(optionName => this._isAttrChanged(optionName));
 
-    const htmlUpdated = this.get('html') !== this.$().trumbowyg('html');
+    const htmlUpdated = get(this, 'html') !== this.$().trumbowyg('html');
     const disabledUpdated = this._isAttrChanged('disabled');
     const placeholderUpdated = this._isAttrChanged('placeholder');
 
@@ -78,7 +79,7 @@ export default Ember.Component.extend(DynamicAttributeBindings, {
       this._updateDisabled();
     }
 
-    this.set('_oldOptions', options);
+    set(this, '_oldOptions', options);
   },
 
   willDestroyElement(){
