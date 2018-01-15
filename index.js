@@ -1,57 +1,85 @@
-/* jshint node: true */
+/* eslint-env node */
 'use strict';
 
-var path = require("path");
-var fs = require("fs");
+const join = require('path').join;
+const fs = require('fs');
 
 module.exports = {
   name: 'ember-cli-trumbowyg',
 
-  included: function(app) {
-    function getAppOption(optionName) {
-        return app.options &&
-          app.options['ember-cli-trubowyg'] &&
-          app.options['ember-cli-trubowyg'][optionName];
+  included (app) {
+    const trumbowygDirAbs = join(app.project.nodeModulesPath, 'trumbowyg', 'dist');
+    const trumbowygDirRel = join('node_modules', 'trumbowyg', 'dist');
+    const languagesDirAbs = join(trumbowygDirAbs, 'langs');
+    const languagesDirRel = join(trumbowygDirRel, 'langs');
+    const pluginDirAbs = join(trumbowygDirAbs, 'plugins');
+    const pluginDirRel = join(trumbowygDirRel, 'plugins');
+
+    let plugins = fs.readdirSync(pluginDirAbs);
+    let languages = fs.readdirSync(languagesDirAbs);
+
+    app.import({
+      development: join(trumbowygDirRel, 'trumbowyg.js'),
+      production: join(trumbowygDirRel, 'trumbowyg.min.js')
+    });
+
+    app.import({
+      development: join(trumbowygDirRel, 'ui', 'trumbowyg.css'),
+      production: join(trumbowygDirRel, 'ui', 'trumbowyg.min.css')
+    });
+
+    app.import(join(trumbowygDirRel, 'ui', 'icons.svg'), {destDir: 'assets/ui'});
+
+    if (app.options && app.options['ember-cli-trumbowyg']) {
+      let trumbowygOptions = app.options['ember-cli-trumbowyg'];
+      let pluginOptions = trumbowygOptions['plugins'];
+      let langOptions = trumbowygOptions['langs'];
+
+      if (pluginOptions) {
+        plugins = pluginOptions;
+      }
+
+      if (langOptions) {
+        languages = langOptions;
+      }
     }
 
-    if (typeof app.import !== "function") {
-      app = app.app;
-    }
+    plugins.forEach((plugin) => {
+      const dirAbs = join(pluginDirAbs, plugin);
+      const dirRel = join(pluginDirRel, plugin);
 
-    this._super.included(app);
+      const pluginName = `trumbowyg.${plugin}`;
 
-    var trumbowygDist = path.join(app.bowerDirectory, 'trumbowyg', 'dist')
-    var trumbowygLangsDist = path.join(trumbowygDist, 'langs');
-    var trumbowygPluginsDist = path.join(trumbowygDist, 'plugins');
+      const pluginCssAbs = join(dirAbs, plugin, 'ui', `${pluginName}`);
+      const pluginCssRel = join(dirRel, plugin, 'ui', `${pluginName}`);
 
-    app.import(path.join(trumbowygDist, 'trumbowyg.min.js'));
-    app.import(path.join(trumbowygDist, 'ui/trumbowyg.min.css'));
-    app.import(path.join(trumbowygDist, 'ui/icons.svg'), { destDir: 'assets/ui' });
+      const minCssExits = fs.existsSync(`${pluginCssAbs}.min.css`);
 
-    var plugins = getAppOption('plugins');
-    if (!plugins) {
-      plugins = fs.readdirSync(trumbowygPluginsDist);
-    }
+      app.import({
+        development: join(dirRel, `${pluginName}.js`),
+        production: join(dirRel, `${pluginName}.min.js`)
+      });
 
-    plugins.forEach(function(plugin){
-      var pluginJs = path.join(trumbowygPluginsDist, plugin, 'trumbowyg.' + plugin +  '.min.js')
-      var pluginCss = path.join(trumbowygPluginsDist, plugin, 'ui', 'trumbowyg.' + plugin +  '.min.css');
-
-      app.import(pluginJs);
-      if (fs.existsSync(pluginCss)) {
-        app.import(pluginCss);
+      if (fs.existsSync(`${pluginCssAbs}.css`)) {
+        if (minCssExits) {
+          app.import({
+            development: `${pluginCssRel}.css`,
+            production: `${pluginCssRel}.min.css`
+          });
+        } else {
+          app.import(`${pluginCssRel}.css`);
+        }
+      } else if (minCssExits) {
+        app.import(`${pluginCssRel}.min.css`);
       }
     });
 
-    var langs = getAppOption('langs');
-    if (!langs) {
-      langs = fs.readdirSync(trumbowygLangsDist)
-        .map(function(fileName){ return (fileName.match(/^(.+)\.min\.js/) || {})[1]; })
-        .filter(function(langs){ return !!langs;})
-    }
-
-    langs.forEach(function(lang){
-      app.import(path.join(trumbowygDist, 'langs', lang + '.min.js'));
+    languages.forEach((lang) => {
+      if (lang.indexOf('.js') === -1) {
+        app.import(join(languagesDirRel, `${lang}.min.js`));
+      } else {
+        app.import(join(languagesDirRel, lang));
+      }
     });
   }
 };
