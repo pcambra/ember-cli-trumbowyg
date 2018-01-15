@@ -8,6 +8,7 @@ export default Ember.Component.extend(DynamicAttributeBindings, {
   html: null,
   placeholder: null,
   disabled: null,
+  options: null,
   change: null,
   init() {
     this.optionNames = [
@@ -40,6 +41,9 @@ export default Ember.Component.extend(DynamicAttributeBindings, {
     this.$().attr("placeholder", get(this, "placeholder"));
     this.$().trumbowyg(options);
     this.$().trumbowyg('html', get(this, 'html'));
+
+    set(this, 'options', options);
+
     this._updateDisabled();
 
     this.$().on('tbwchange', () => {
@@ -55,7 +59,7 @@ export default Ember.Component.extend(DynamicAttributeBindings, {
   },
 
   _isAttrChanged(attrName){
-    return get(this, attrName) !== get(this, `_oldOptions.${attrName}`);
+    return get(this, attrName) !== get(this, attrName);
   },
 
   didInsertElement(){
@@ -64,10 +68,8 @@ export default Ember.Component.extend(DynamicAttributeBindings, {
 
   didUpdateAttrs() {
     const options = getProperties(this, get(this, 'optionNames').concat(['disabled', 'placeholder']));
-
     const optionsUpdated = get(this, 'optionNames').some(optionName => this._isAttrChanged(optionName));
 
-    const htmlUpdated = get(this, 'html') !== this.$().trumbowyg('html');
     const disabledUpdated = this._isAttrChanged('disabled');
     const placeholderUpdated = this._isAttrChanged('placeholder');
 
@@ -80,7 +82,7 @@ export default Ember.Component.extend(DynamicAttributeBindings, {
       this._updateDisabled();
     }
 
-    set(this, '_oldOptions', options);
+    set(this, 'options', options);
   },
 
   willDestroyElement(){
