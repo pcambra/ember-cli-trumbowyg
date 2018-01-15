@@ -1,8 +1,8 @@
-import Component from '@ember/component';
-import { get, set, getProperties } from '@ember/object';
+import Ember from 'ember';
+const { get, set, getProperties } = Ember;
 import DynamicAttributeBindings from '../-private/dynamic-attribute-bindings';
 
-export default Component.extend(DynamicAttributeBindings, {
+export default Ember.Component.extend(DynamicAttributeBindings, {
   attributeBindings: [],
   tagName: 'textarea',
   html: null,
