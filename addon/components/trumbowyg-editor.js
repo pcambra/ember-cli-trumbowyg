@@ -18,7 +18,8 @@ export default Component.extend(DynamicAttributeBindings, {
       'semantic',
       'resetCss',
       'removeformatPasted',
-      'autogrow'
+      'autogrow',
+      'svgPath'
     ];
     this._super(...arguments);
   },
