@@ -1,4 +1,3 @@
-/* eslint-env node */
 'use strict';
 
 const join = require('path').join;

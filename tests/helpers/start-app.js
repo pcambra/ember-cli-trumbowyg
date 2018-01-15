@@ -3,7 +3,9 @@ import Application from '../../app';
 import config from '../../config/environment';
 
 export default function startApp(attrs) {
-  let application;
+  let attributes = merge({}, config.APP);
+  attributes.autoboot = true;
+  attributes = merge(attributes, attrs); // use defaults, but you can override;
 
   let attributes = Ember.merge({}, config.APP);
   attributes = Ember.merge(attributes, attrs); // use defaults, but you can override;
