@@ -1,10 +1,9 @@
 import Ember from 'ember';
-import layout from '../templates/components/trumbowyg-editor';
+
 import DynamicAttributeBindings from '../-private/dynamic-attribute-bindings';
 
 export default Ember.Component.extend(DynamicAttributeBindings, {
   attributeBindings: [],
-  layout,
   tagName: 'textarea',
   html: null,
   placeholder: null,
