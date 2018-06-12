@@ -1,33 +1,34 @@
+/* eslint-env node */
 'use strict';
 
-const join = require('path').join;
+const path = require('path');
 const fs = require('fs');
 
 module.exports = {
   name: 'ember-cli-trumbowyg',
 
   included (app) {
-    const trumbowygDirAbs = join(app.project.nodeModulesPath, 'trumbowyg', 'dist');
-    const trumbowygDirRel = join('node_modules', 'trumbowyg', 'dist');
-    const languagesDirAbs = join(trumbowygDirAbs, 'langs');
-    const languagesDirRel = join(trumbowygDirRel, 'langs');
-    const pluginDirAbs = join(trumbowygDirAbs, 'plugins');
-    const pluginDirRel = join(trumbowygDirRel, 'plugins');
+    const trumbowygDirAbs = path.join(path.resolve('node_modules'), 'trumbowyg', 'dist');
+    const trumbowygDirRel = path.join('node_modules', 'trumbowyg', 'dist');
+    const languagesDirAbs = path.join(trumbowygDirAbs, 'langs');
+    const languagesDirRel = path.join(trumbowygDirRel, 'langs');
+    const pluginDirAbs = path.join(trumbowygDirAbs, 'plugins');
+    const pluginDirRel = path.join(trumbowygDirRel, 'plugins');
 
     let plugins = fs.readdirSync(pluginDirAbs);
     let languages = fs.readdirSync(languagesDirAbs);
 
     app.import({
-      development: join(trumbowygDirRel, 'trumbowyg.js'),
-      production: join(trumbowygDirRel, 'trumbowyg.min.js')
+      development: path.join(trumbowygDirRel, 'trumbowyg.js'),
+      production: path.join(trumbowygDirRel, 'trumbowyg.min.js')
     });
 
     app.import({
-      development: join(trumbowygDirRel, 'ui', 'trumbowyg.css'),
-      production: join(trumbowygDirRel, 'ui', 'trumbowyg.min.css')
+      development: path.join(trumbowygDirRel, 'ui', 'trumbowyg.css'),
+      production: path.join(trumbowygDirRel, 'ui', 'trumbowyg.min.css')
     });
 
-    app.import(join(trumbowygDirRel, 'ui', 'icons.svg'), {destDir: 'assets/ui'});
+    app.import(path.join(trumbowygDirRel, 'ui', 'icons.svg'), {destDir: 'assets/ui'});
 
     if (app.options && app.options['ember-cli-trumbowyg']) {
       let trumbowygOptions = app.options['ember-cli-trumbowyg'];
@@ -44,19 +45,19 @@ module.exports = {
     }
 
     plugins.forEach((plugin) => {
-      const dirAbs = join(pluginDirAbs, plugin);
-      const dirRel = join(pluginDirRel, plugin);
+      const dirAbs = path.join(pluginDirAbs, plugin);
+      const dirRel = path.join(pluginDirRel, plugin);
 
       const pluginName = `trumbowyg.${plugin}`;
 
-      const pluginCssAbs = join(dirAbs, plugin, 'ui', `${pluginName}`);
-      const pluginCssRel = join(dirRel, plugin, 'ui', `${pluginName}`);
+      const pluginCssAbs = path.join(dirAbs, plugin, 'ui', `${pluginName}`);
+      const pluginCssRel = path.join(dirRel, plugin, 'ui', `${pluginName}`);
 
       const minCssExits = fs.existsSync(`${pluginCssAbs}.min.css`);
 
       app.import({
-        development: join(dirRel, `${pluginName}.js`),
-        production: join(dirRel, `${pluginName}.min.js`)
+        development: path.join(dirRel, `${pluginName}.js`),
+        production: path.join(dirRel, `${pluginName}.min.js`)
       });
 
       if (fs.existsSync(`${pluginCssAbs}.css`)) {
@@ -75,9 +76,9 @@ module.exports = {
 
     languages.forEach((lang) => {
       if (lang.indexOf('.js') === -1) {
-        app.import(join(languagesDirRel, `${lang}.min.js`));
+        app.import(path.join(languagesDirRel, `${lang}.min.js`));
       } else {
-        app.import(join(languagesDirRel, lang));
+        app.import(path.join(languagesDirRel, lang));
       }
     });
   }
