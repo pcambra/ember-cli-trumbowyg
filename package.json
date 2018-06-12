@@ -19,7 +19,7 @@
   },
   "repository": "https://github.com/ipavelpetrov/ember-cli-trumbowyg",
   "dependencies": {
-    "ember-cli-babel": "^6.6.0"
+    "ember-cli-babel": "^6.11.0"
   },
   "author": "Pavel Petrov <ipavelpetrov@ya.ru>",
   "license": "MIT",
